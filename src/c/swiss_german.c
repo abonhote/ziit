@@ -1,19 +1,16 @@
 #include "pebble.h"
 
 // Debugging (man weiss ja nie ...)
-#define DEBUG_TIME 1
-#define DEBUG_H 23
-#define DEBUG_M 24
-#define DEBUG_S 40
+#define DEBUG_TIME
 
 #ifdef DEBUG_TIME
 static time_t get_debug_start() {
   time_t now = time(NULL);
   struct tm *t = localtime(&now);
   
-  t->tm_hour = DEBUG_H;
-  t->tm_min  = DEBUG_M;
-  t->tm_sec  = DEBUG_S;
+  t->tm_hour = 23;
+  t->tm_min  = 24;
+  t->tm_sec  = 50;
   
   return mktime(t);
 }
@@ -113,12 +110,9 @@ static void window_unload(Window *window) {
 
 static void display_time(struct tm *time) {
 
-  const char *hrs[12] = { "zwölfi", "eis","zwei", "drü", "vieri", "foifi", "sächsi",
-		 "sibni", "achti", "nüni", "zäni", "elfi" };
-  const char *hour_string[25];
-  for (int i = 0 ; i < 12; i++) hour_string[i] = hrs[i];
-  for (int i = 0 ; i < 12; i++) hour_string[i+12] = hrs[i];
-  hour_string[25] = hrs[0];
+  const char *hour_string[25] = { "zwölfi", "eis","zwei", "drü", "vieri", "foifi", "sächsi",
+		 "sibni", "achti", "nüni", "zäni", "elfi", "zwölfi", "eis","zwei", "drü", "vieri", "foifi", "sächsi",
+		 "sibni", "achti", "nüni", "zäni", "elfi", "zwölfi" };
 
   int hour = time->tm_hour;
   int min = time->tm_min;
@@ -133,7 +127,7 @@ static void display_time(struct tm *time) {
   	 strcpy(minute_text , "");
   }
   if (4 < min && min < 10) {
-  	 strcpy(minute_text , "\nföif ab");
+  	 strcpy(minute_text , "\nfoif ab");
   }
   if (9 < min && min < 15) {
   	 strcpy(minute_text , "\nzäh ab");
@@ -145,13 +139,13 @@ static void display_time(struct tm *time) {
   	 strcpy(minute_text , "zwänzg ab");
   }
   if (24 < min && min < 30) {
-  	 strcpy(minute_text , "föif vor halbi");
+  	 strcpy(minute_text , "foif vor halbi");
   }
   if (29 < min && min < 35) {
   	 strcpy(minute_text , "\nhalbi");
   }
   if (34 < min && min < 40) {
-  	 strcpy(minute_text , "föif ab halbi");
+  	 strcpy(minute_text , "foif ab halbi");
   }
   if (39 < min && min < 45) {
   	 strcpy(minute_text , "zwänzg vor");
@@ -163,7 +157,7 @@ static void display_time(struct tm *time) {
   	 strcpy(minute_text , "\nzäh vor");
   }
   if (54 < min && min < 60) {
-  	 strcpy(minute_text , "\nföif vor");
+  	 strcpy(minute_text , "\nfoif vor");
   }
   
   static char staticTimeText[50] = ""; // Needs to be static because it's used by the system later.
@@ -179,7 +173,13 @@ static void display_time(struct tm *time) {
 
 
 static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
+#ifdef DEBUG_TIME
+  time_t adj = mktime(tick_time) + debug_offset;
+  struct tm *debug_time = localtime(&adj);
+  display_time(debug_time);
+#else
   display_time(tick_time);
+#endif
 }
 
 static void init(void) {
