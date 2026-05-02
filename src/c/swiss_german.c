@@ -1,7 +1,7 @@
 #include "pebble.h"
 
 // Debugging (man weiss ja nie ...)
-#define DEBUG_TIME
+//#define DEBUG_TIME
 
 #ifdef DEBUG_TIME
 static time_t get_debug_start() {
@@ -25,17 +25,17 @@ static time_t get_time() {
   return time(NULL) + debug_offset;
 }
 #else
-static void get_debug_start() {}
-static time_t get_time() { return time(NULL) }
+static time_t get_time() { return time(NULL); }
 #endif
 
 static Window *window;
 static TextLayer *minuteLayer; // The Minutes
 static TextLayer *hourLayer; // The hours
+static int fontsize = 42; // doof, aber aktuell nichts anderes da
 
 static void init_text_layers(GRect bounds) {
   int paddingLeft = PBL_IF_ROUND_ELSE(0, 10);
-  int top = (bounds.size.h - 3 * 42)/2 - 8;
+  int top = (bounds.size.h - 3 * fontsize)/2 - 8;
 
   GRect minuteFrame = (GRect) {
     .origin = {
@@ -44,7 +44,7 @@ static void init_text_layers(GRect bounds) {
     },
     .size = {
       bounds.size.w - paddingLeft /* width */,
-      3 * 42  /* height */
+      3 * fontsize  /* height */
     }
   };
   minuteLayer = text_layer_create(minuteFrame);
@@ -57,11 +57,11 @@ static void init_text_layers(GRect bounds) {
   GRect hourFrame = (GRect) {
     .origin = {
       paddingLeft,
-      top + (2 * 42)
+      top + (2 * fontsize)
     },
     .size = {
       bounds.size.w - paddingLeft /* width */,
-      42 + 10 /* height */
+      fontsize + 10 /* height */
     }
   };
   hourLayer = text_layer_create(hourFrame);
@@ -76,14 +76,14 @@ static void init_text_layers(GRect bounds) {
 static void prv_unobstructed_change(AnimationProgress progress, void *context) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_unobstructed_bounds(window_layer);
-  int top = (bounds.size.h - 3 * 42)/2 - 8;
+  int top = (bounds.size.h - 3 * fontsize)/2 - 8;
 
   GRect minuteFrame  = layer_get_frame(text_layer_get_layer(minuteLayer));
   minuteFrame.origin.y = top;
   layer_set_frame(text_layer_get_layer(minuteLayer), minuteFrame);
 
   GRect hourFrame = layer_get_frame(text_layer_get_layer(hourLayer));
-  hourFrame.origin.y = top + (42 * 2);
+  hourFrame.origin.y = top + (fontsize * 2);
   layer_set_frame(text_layer_get_layer(hourLayer), hourFrame);
 }
 
@@ -183,7 +183,9 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void init(void) {
+#ifdef DEBUG_TIME
   init_debug_time();
+#endif
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
