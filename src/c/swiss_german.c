@@ -1,4 +1,36 @@
-#include <pebble.h>
+#include "pebble.h"
+
+// Debugging (man weiss ja nie ...)
+#define DEBUG_TIME 1
+#define DEBUG_H 23
+#define DEBUG_M 24
+#define DEBUG_S 40
+
+#ifdef DEBUG_TIME
+static time_t get_debug_start() {
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  
+  t->tm_hour = DEBUG_H;
+  t->tm_min  = DEBUG_M;
+  t->tm_sec  = DEBUG_S;
+  
+  return mktime(t);
+}
+
+static time_t debug_offset = 0;
+
+static void init_debug_time() {
+  debug_offset = get_debug_start() -time(NULL);
+}
+
+static time_t get_time() {
+  return time(NULL) + debug_offset;
+}
+#else
+static void get_debug_start() {}
+static time_t get_time() { return time(NULL) }
+#endif
 
 static Window *window;
 static TextLayer *minuteLayer; // The Minutes
@@ -81,9 +113,12 @@ static void window_unload(Window *window) {
 
 static void display_time(struct tm *time) {
 
-const char *hour_string[25] = { "zwölfi", "eis","zwei", "drü", "viäri", "föifi", "sächsi",
-		 "sibni", "achti", "nüni", "zäni", "elfi", "zwölfi", "eis", "zwei", "drü", "viäri",
-		 "föifi", "sächsi", "sibni", "achti", "nüni", "zäni", "elfi" , "zwölfi"};
+  const char *hrs[12] = { "zwölfi", "eis","zwei", "drü", "vieri", "foifi", "sächsi",
+		 "sibni", "achti", "nüni", "zäni", "elfi" };
+  const char *hour_string[25];
+  for (int i = 0 ; i < 12; i++) hour_string[i] = hrs[i];
+  for (int i = 0 ; i < 12; i++) hour_string[i+12] = hrs[i];
+  hour_string[25] = hrs[0];
 
   int hour = time->tm_hour;
   int min = time->tm_min;
@@ -148,6 +183,7 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void init(void) {
+  init_debug_time();
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
@@ -157,7 +193,7 @@ static void init(void) {
   window_stack_push(window, animated);
   window_set_background_color(window, GColorBlack);
   
-  time_t now = time(NULL);
+  time_t now = get_time();
   struct tm *tick_time = localtime(&now);
   display_time(tick_time);
   

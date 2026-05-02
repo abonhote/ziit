@@ -1,27 +1,15 @@
 {
-    "name": "swiss_german",
-    "author": "Micha Surber",
-    "version": "1.1.0",
+    "author": "Andr\u00e9 Bonh\u00f4te",
     "dependencies": {},
-    "keywords": ["pebble-app"],
+    "keywords": [
+        "pebble-app"
+    ],
+    "name": "ziit",
     "pebble": {
-        "displayName": "Swiss German",
-        "uuid": "c777dc1b-0dff-4d40-9e37-145b5de1e2fd",
-        "sdkVersion": "3",
+        "displayName": "Ziit",
         "enableMultiJS": false,
+        "messageKeys": [],
         "projectType": "native",
-        "targetPlatforms": [
-            "aplite",
-            "basalt",
-            "chalk",
-            "diorite"
-        ],
-        "watchapp": {
-            "watchface": true
-        },
-        "messageKeys": {
-            "dummy": 0
-        },
         "resources": {
             "media": [
                 {
@@ -31,6 +19,18 @@
                     "type": "png"
                 }
             ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt",
+            "chalk",
+            "diorite"
+        ],
+        "uuid": "c777dc1b-0dff-4d40-9e37-145b5de1e2fd",
+        "watchapp": {
+            "watchface": true
         }
-    }
+    },
+    "version": "0.1.0"
 }
